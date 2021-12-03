@@ -8,7 +8,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.sikulix</groupId>
+  <groupId>com.sikulix.custom</groupId>
   <artifactId>sikulixapi</artifactId>
   <version>2.0.3</version>
 

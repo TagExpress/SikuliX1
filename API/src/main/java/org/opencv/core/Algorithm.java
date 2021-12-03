@@ -93,19 +93,10 @@ public class Algorithm {
         delete(nativeObj);
     }
 
-
-    //
-    // C++:  void write(Ptr_FileStorage fs, String name = String())
-    //
-
-    // Unknown type 'Ptr_FileStorage' (I), skipping the function
-
-
     @Override
     protected void finalize() throws Throwable {
-        delete(nativeObj);
+//        delete(nativeObj);
     }
-
 
 
     // C++:  String getDefaultName()

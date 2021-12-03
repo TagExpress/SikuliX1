@@ -943,8 +943,7 @@ public class Mat {
 
     @Override
     protected void finalize() throws Throwable {
-        n_delete(nativeObj);
-        super.finalize();
+//        n_delete(nativeObj);
     }
 
     // javadoc:Mat::toString()

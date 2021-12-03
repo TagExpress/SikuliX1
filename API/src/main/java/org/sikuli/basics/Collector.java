@@ -3,9 +3,7 @@ package org.sikuli.basics;
 import org.opencv.core.Algorithm;
 import org.opencv.core.Mat;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,17 +22,40 @@ public class Collector {
     }
 
     public static void release() {
+
+        Map<Long,Mat> matReferences = new TreeMap<>();
+        Map<Long,Algorithm> algReferences = new TreeMap<>();
+
         for (Object reference : references) {
             try {
                 if (reference instanceof Mat) {
-                    ((Mat)reference).deleteNativeObject();
+                    matReferences.put(((Mat)reference).nativeObj, ((Mat)reference));
                 } else if (reference instanceof Algorithm) {
-                    ((Algorithm)reference).deleteNativeObject();
+                    algReferences.put(((Algorithm)reference).getNativeObjAddr(), ((Algorithm)reference));
                 }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
+
+        for (Mat mat : matReferences.values()) {
+            try {
+                logger.log(Level.INFO, "deleting Mat:{0}", mat.nativeObj);
+                mat.deleteNativeObject();
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+
+        for (Algorithm alg : algReferences.values()) {
+            try {
+                logger.log(Level.INFO, "deleting Algorithm:{0}", alg.getNativeObjAddr());
+                alg.deleteNativeObject();
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+
         references.clear();
     }
 }
