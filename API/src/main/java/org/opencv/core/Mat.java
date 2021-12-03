@@ -4,6 +4,8 @@
 
 package org.opencv.core;
 
+import org.sikuli.basics.Collector;
+
 import java.nio.ByteBuffer;
 
 // C++: class Mat
@@ -17,6 +19,7 @@ public class Mat {
         if (addr == 0)
             throw new java.lang.UnsupportedOperationException("Native object address is NULL");
         nativeObj = addr;
+        Collector.add(this);
     }
 
     //
@@ -28,6 +31,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat();
+        Collector.add(this);
 
         return;
     }
@@ -41,6 +45,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(rows, cols, type);
+        Collector.add(this);
 
         return;
     }
@@ -54,6 +59,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(rows, cols, type, data);
+        Collector.add(this);
 
         return;
     }
@@ -67,6 +73,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(size.width, size.height, type);
+        Collector.add(this);
 
         return;
     }
@@ -80,6 +87,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(rows, cols, type, s.val[0], s.val[1], s.val[2], s.val[3]);
+        Collector.add(this);
 
         return;
     }
@@ -93,6 +101,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(size.width, size.height, type, s.val[0], s.val[1], s.val[2], s.val[3]);
+        Collector.add(this);
 
         return;
     }
@@ -106,6 +115,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(m.nativeObj, rowRange.start, rowRange.end, colRange.start, colRange.end);
+        Collector.add(this);
 
         return;
     }
@@ -115,6 +125,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(m.nativeObj, rowRange.start, rowRange.end);
+        Collector.add(this);
 
         return;
     }
@@ -128,6 +139,7 @@ public class Mat {
     {
 
         nativeObj = n_Mat(m.nativeObj, roi.y, roi.y + roi.height, roi.x, roi.x + roi.width);
+        Collector.add(this);
 
         return;
     }
@@ -923,6 +935,10 @@ public class Mat {
         Mat retVal = new Mat(n_zeros(size.width, size.height, type));
 
         return retVal;
+    }
+
+    public void deleteNativeObject() {
+        n_delete(nativeObj);
     }
 
     @Override

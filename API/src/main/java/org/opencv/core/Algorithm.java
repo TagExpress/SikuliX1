@@ -7,6 +7,8 @@
 //
 package org.opencv.core;
 
+import org.sikuli.basics.Collector;
+
 import java.lang.String;
 
 // C++: class Algorithm
@@ -15,7 +17,10 @@ import java.lang.String;
 public class Algorithm {
 
     protected final long nativeObj;
-    protected Algorithm(long addr) { nativeObj = addr; }
+    protected Algorithm(long addr) {
+        nativeObj = addr;
+        Collector.add(this);
+    }
 
     public long getNativeObjAddr() { return nativeObj; }
 
@@ -82,6 +87,10 @@ public class Algorithm {
         save_0(nativeObj, filename);
         
         return;
+    }
+
+    public void deleteNativeObject() {
+        delete(nativeObj);
     }
 
 
