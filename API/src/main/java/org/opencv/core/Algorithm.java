@@ -90,12 +90,12 @@ public class Algorithm {
     }
 
     public void deleteNativeObject() {
-        delete(nativeObj);
+//        delete(nativeObj);
     }
 
     @Override
     protected void finalize() throws Throwable {
-//        delete(nativeObj);
+        delete(nativeObj);
     }
 
 

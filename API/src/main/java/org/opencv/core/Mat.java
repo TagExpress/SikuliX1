@@ -938,12 +938,12 @@ public class Mat {
     }
 
     public void deleteNativeObject() {
-        n_delete(nativeObj);
+//        n_delete(nativeObj);
     }
 
     @Override
     protected void finalize() throws Throwable {
-//        n_delete(nativeObj);
+        n_delete(nativeObj);
     }
 
     // javadoc:Mat::toString()

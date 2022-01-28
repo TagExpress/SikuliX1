@@ -65,6 +65,10 @@ public class Image extends Element {
     init(fname, fURL);
   }
 
+  private Image(String fname, URL fURL, BufferedImage bimg) {
+    init(fname, fURL, bimg);
+  }
+
   private Image(URL fURL) {
     if (fURL != null) {
       if ("file".equals(fURL.getProtocol())) {
@@ -78,6 +82,10 @@ public class Image extends Element {
   }
 
   private void init(String fileName, URL fURL) {
+    init(fileName, fURL, null);
+  }
+
+  private void init(String fileName, URL fURL, BufferedImage bimg) {
     setName(fileName);
     if (getName().isEmpty() || fURL == null) {
       return;
@@ -87,7 +95,7 @@ public class Image extends Element {
       imageIsBundled = true;
       setName(new File(getName()).getName());
     }
-    load();
+    load(bimg);
   }
 
   public static void reinit(Image img) {
@@ -125,6 +133,13 @@ public class Image extends Element {
       imgTarget.setIsPattern(true);
     }
     return imgTarget;
+  }
+
+  public Image(BufferedImage img, String name, String fName) {
+    this.bimg = img;
+    this.setName(name);
+    this.fileURL = FileManager.makeURL(fName);
+    this.imageNameGiven = fName;
   }
 
   /**
@@ -653,6 +668,11 @@ public class Image extends Element {
     return createImageValidate(img);
   }
 
+  public static Image create(String fName, BufferedImage bimg) {
+    Image img = get(fName, bimg);
+    return createImageValidate(img);
+  }
+
   /**
    * create a new image from the given file <br>
    * file ending .png is added if missing (currently valid: png, jpg, jpeg)<br>
@@ -973,6 +993,10 @@ public class Image extends Element {
    * @return this
    */
   private static Image get(String fName) {
+    return get(fName, null);
+  }
+
+  private static Image get(String fName, BufferedImage bimg) {
     if (fName == null || fName.isEmpty()) {
       return null;
     }
@@ -1007,14 +1031,14 @@ public class Image extends Element {
         }
       }
       if (image == null) {
-        image = new Image(imageFileName, imageURL);
+        image = new Image(imageFileName, imageURL, bimg);
         image.setIsAbsolute(imageFile.isAbsolute());
       } else {
         if (image.bimg != null) {
           log(3, "reused: %s (%s)", image.getName(), image.fileURL);
         } else {
           if (Settings.getImageCache() > 0) {
-            image.load();
+            image.load(bimg);
           }
         }
       }
@@ -1024,17 +1048,27 @@ public class Image extends Element {
   }
 
   private BufferedImage load() {
+    return load(null);
+  }
+
+  private BufferedImage load(BufferedImage preloaded) {
     BufferedImage bImage = null;
     if (fileURL != null) {
       bimg = null;
-      try {
-        bImage = ImageIO.read(fileURL);
-      } catch (Exception e) {
-        log(-1, "load: failed: %s", fileURL);
-        bHasIOException = true;
-        fileURL = null;
-        return null;
+
+      if (preloaded == null) {
+        try {
+          bImage = ImageIO.read(fileURL);
+        } catch (Exception e) {
+          log(-1, "load: failed: %s", fileURL);
+          bHasIOException = true;
+          fileURL = null;
+          return null;
+        }
+      } else {
+        bImage = preloaded;
       }
+
       if (getName() != null) {
         imageFiles.put(fileURL, this);
         imageNames.put(getName(), fileURL);

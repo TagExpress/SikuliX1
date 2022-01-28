@@ -65,6 +65,10 @@ public class Match extends Region implements Comparable<Match> {
     return lastFindTime;
   }
 
+  public long getLastSearchTime() {
+    return lastSearchTime;
+  }
+
   /**
    * create a copy of Match object<br>
    * to e.g. set another TargetOffset for same match
@@ -207,7 +211,7 @@ public class Match extends Region implements Comparable<Match> {
    *
    * @param img Image
    */
-  protected void setImage(Image img) {
+  public void setImage(Image img) {
     image = img;
   }
 

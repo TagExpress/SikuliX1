@@ -7,6 +7,7 @@ import org.sikuli.android.ADBDevice;
 import org.sikuli.android.ADBScreen;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.Settings;
+import org.sikuli.script.proxyapi.SkApiClient;
 import org.sikuli.script.support.Observer;
 import org.sikuli.script.support.*;
 import org.sikuli.util.Highlight;
@@ -2242,6 +2243,9 @@ public class Region extends Element {
    * @throws FindFailed if the Find operation failed
    */
   public <PSI> Match find(PSI target) throws FindFailed {
+    if (SkApiClient.isClient())
+      return SkApiClient.find(this, target);
+
     lastMatch = null;
     Image img = Element.getImageFromTarget(target);
     Boolean response = true;
@@ -2420,6 +2424,9 @@ public class Region extends Element {
    * @throws FindFailed if the Find operation failed
    */
   public <PSI> Iterator<Match> findAll(PSI target) throws FindFailed {
+    if (SkApiClient.isClient())
+      return SkApiClient.findAll(this, target);
+
     lastMatches = null;
     RepeatableFindAll rf = new RepeatableFindAll(target, null);
     Image img = rf._image;
@@ -2539,6 +2546,9 @@ public class Region extends Element {
   }
 
   public Match findBest(Object... args) {
+    if (SkApiClient.isClient())
+      return SkApiClient.findBest(this, args);
+
     if (args.length == 0) {
       return null;
     }

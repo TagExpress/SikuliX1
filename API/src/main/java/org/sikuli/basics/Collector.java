@@ -12,26 +12,23 @@ public class Collector {
     private static final Set<Object> references = new HashSet<>();
 
     public static synchronized <T> T add(T reference) {
-        references.add(reference);
+//        references.add(reference);
         return reference;
     }
 
     public static synchronized <T> Collection<T> addAll(Collection<T> referenceList) {
-        references.addAll(referenceList);
+//        references.addAll(referenceList);
         return referenceList;
     }
 
     public static void release() {
 
         Map<Long,Mat> matReferences = new TreeMap<>();
-        Map<Long,Algorithm> algReferences = new TreeMap<>();
 
         for (Object reference : references) {
             try {
                 if (reference instanceof Mat) {
                     matReferences.put(((Mat)reference).nativeObj, ((Mat)reference));
-                } else if (reference instanceof Algorithm) {
-                    algReferences.put(((Algorithm)reference).getNativeObjAddr(), ((Algorithm)reference));
                 }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -42,15 +39,6 @@ public class Collector {
             try {
                 logger.log(Level.INFO, "deleting Mat:{0}", mat.nativeObj);
                 mat.deleteNativeObject();
-            } catch (Exception ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-
-        for (Algorithm alg : algReferences.values()) {
-            try {
-                logger.log(Level.INFO, "deleting Algorithm:{0}", alg.getNativeObjAddr());
-                alg.deleteNativeObject();
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
