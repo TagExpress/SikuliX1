@@ -34,8 +34,8 @@ public class SkApiClient {
             args.add("java");
             args.add("-cp");
             args.add("target" + File.separator + "lib" + File.separator + "*");
-            args.add("-Xms1024m");
-            args.add("-Xmx1024m");
+            args.add("-Xms64m");
+            args.add("-Xmx2048m");
             args.add("-Dfile.encoding=" + System.getProperty("file.encoding", StandardCharsets.UTF_8.name()));
 
             args.add(SkApiServer.class.getName());
