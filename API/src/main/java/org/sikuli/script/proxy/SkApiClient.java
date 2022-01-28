@@ -92,13 +92,11 @@ public class SkApiClient {
 
         synchronized (process) {
             try {
+                logger.log(Level.INFO, "request message: {0}, data.length: {1}",
+                        new Object[] {request.getName(), request.getData().length});
+
                 MessageWriter writer = new MessageWriter(output);
-
                 byte[] name = request.getName().getBytes();
-
-                logger.log(Level.INFO, "sending message...");
-                logger.log(Level.INFO, "message.name.length:" + name.length);
-                logger.log(Level.INFO, "message.data.length:" + request.getData().length);
 
                 writer.writeInt(name.length);
                 writer.writeBytes(name);
@@ -112,6 +110,9 @@ public class SkApiClient {
                 Message response = new Message(null, null);
                 response.setName(new String(reader.readBytes(reader.readInt())));
                 response.setData(reader.readBytes(reader.readInt()));
+
+                logger.log(Level.INFO, "response message: {0}, data.length: {1}",
+                        new Object[] {response.getName(), response.getData().length});
 
                 if ("exception".equals(response.getName())) {
                     throw new RuntimeException(new String(response.getData()));

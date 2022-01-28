@@ -64,19 +64,20 @@ public class SkApiServer {
     static private void receiveMessage() {
         try {
             MessageReader reader = new MessageReader(input);
-
             Message request = new Message(null, null);
             request.setName(new String(reader.readBytes(reader.readInt())));
             request.setData(reader.readBytes(reader.readInt()));
 
-            logger.log(Level.INFO, "received message.");
-            logger.log(Level.INFO, "message.name.length:" + request.getName().getBytes().length);
-            logger.log(Level.INFO, "message.data.length:" + request.getData().length);
+            logger.log(Level.INFO, "request message: {0}, data.length: {1}",
+                    new Object[] {request.getName(), request.getData().length});
 
             Message response = processMessage(request);
-            byte[] name = response.getName().getBytes();
+
+            logger.log(Level.INFO, "response message: {0}, data.length: {1}",
+                    new Object[] {response.getName(), response.getData().length});
 
             MessageWriter writer = new MessageWriter(output);
+            byte[] name = response.getName().getBytes();
 
             writer.writeInt(name.length);
             writer.writeBytes(name);
