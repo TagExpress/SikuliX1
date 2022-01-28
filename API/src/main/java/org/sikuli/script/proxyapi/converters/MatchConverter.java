@@ -15,7 +15,7 @@ public class MatchConverter {
         int capacity = 5 * Integer.BYTES
                 + Double.BYTES
                 + 2 * Long.BYTES
-                + 1 + 2 * Integer.BYTES
+                + 1
                 + Integer.BYTES + image.length;
 
         ByteBuffer buffer = ByteBuffer.allocate(capacity);
@@ -28,17 +28,9 @@ public class MatchConverter {
         buffer.putLong(match.getTime());
         buffer.putLong(match.getLastSearchTime());
 
-        Location target = match.getTarget();
-        byte targetFlag;
-        if (target != null) {
-            targetFlag = (byte)1;
-        } else {
-            targetFlag = (byte)0;
-            target = new Location(0, 0);
-        }
-        buffer.put(targetFlag);
-        buffer.putInt(target.x);
-        buffer.putInt(target.y);
+        byte hasScreen = match.getScreen() != null ? (byte)1 : (byte)0;
+
+        buffer.put(hasScreen);
 
         buffer.putInt(image.length);
         buffer.put(image);
@@ -57,20 +49,23 @@ public class MatchConverter {
         long findTime = buffer.getLong();
         long searchTime = buffer.getLong();
 
-        byte targetFlag = buffer.get();
-        int targetX = buffer.getInt();
-        int targetY = buffer.getInt();
+        boolean hasScreen = buffer.get() == (byte)1;
+        Screen screen = hasScreen ? Screen.getPrimaryScreen() : null;
 
         byte[] image = new byte[buffer.getInt()];
         buffer.get(image);
 
-        Match match = new Match(x, y, w, h, score, Screen.getPrimaryScreen());
+        Match match = new Match(x, y, w, h, score, screen);
         match.setIndex(index);
         match.setTimes(findTime, searchTime);
+        match.x = x;
+        match.y = y;
+        match.w = w;
+        match.h = h;
 
-        if (targetFlag == (byte)1) {
-            match.setTarget(targetX, targetY);
-        }
+//        if (targetFlag == (byte)1) {
+//            match.setTarget(targetX, targetY);
+//        }
 
         ImageConverter converter = ImageConverter.getInstance();
         match.setImage(converter.fromByte(image));
