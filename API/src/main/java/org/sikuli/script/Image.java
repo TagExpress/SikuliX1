@@ -135,13 +135,6 @@ public class Image extends Element {
     return imgTarget;
   }
 
-  public Image(BufferedImage img, String name, String fName) {
-    this.bimg = img;
-    this.setName(name);
-    this.fileURL = FileManager.makeURL(fName);
-    this.imageNameGiven = fName;
-  }
-
   /**
    * create a new image from a buffered image<br>
    * can only be reused with the object reference
