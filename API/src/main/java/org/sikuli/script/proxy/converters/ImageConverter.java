@@ -1,4 +1,4 @@
-package org.sikuli.script.proxyapi.converters;
+package org.sikuli.script.proxy.converters;
 
 import org.sikuli.script.Image;
 

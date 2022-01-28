@@ -7,7 +7,7 @@ import org.sikuli.android.ADBDevice;
 import org.sikuli.android.ADBScreen;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.Settings;
-import org.sikuli.script.proxyapi.SkApiClient;
+import org.sikuli.script.proxy.SkApiClient;
 import org.sikuli.script.support.Observer;
 import org.sikuli.script.support.*;
 import org.sikuli.util.Highlight;

@@ -1,6 +1,5 @@
-package org.sikuli.script.proxyapi.converters;
+package org.sikuli.script.proxy.converters;
 
-import org.sikuli.script.Location;
 import org.sikuli.script.Match;
 import org.sikuli.script.Screen;
 

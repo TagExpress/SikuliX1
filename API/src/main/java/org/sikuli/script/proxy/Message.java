@@ -1,8 +1,4 @@
-package org.sikuli.script.proxyapi;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
+package org.sikuli.script.proxy;
 
 public class Message {
     private String name;

@@ -1,4 +1,4 @@
-package org.sikuli.script.proxyapi;
+package org.sikuli.script.proxy;
 
 import java.io.OutputStream;
 import java.nio.ByteBuffer;

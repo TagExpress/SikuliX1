@@ -1,11 +1,10 @@
-package org.sikuli.script.proxyapi;
+package org.sikuli.script.proxy;
 
-import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
-import org.sikuli.script.proxyapi.converters.ImageConverter;
-import org.sikuli.script.proxyapi.converters.MatchConverter;
-import org.sikuli.script.proxyapi.converters.PatternConverter;
-import org.sikuli.script.proxyapi.converters.RegionConverter;
+import org.sikuli.script.proxy.converters.ImageConverter;
+import org.sikuli.script.proxy.converters.MatchConverter;
+import org.sikuli.script.proxy.converters.PatternConverter;
+import org.sikuli.script.proxy.converters.RegionConverter;
 
 import java.io.File;
 import java.io.InputStream;
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 
 public class SkApiClient {
     private static final Logger logger = Logger.getLogger(SkApiClient.class.getName());
-    private static Process process;
+    private static volatile Process process;
     private static InputStream input;
     private static OutputStream output;
 
@@ -27,7 +26,7 @@ public class SkApiClient {
         return Boolean.parseBoolean(System.getProperty("sikulixapiclient", "false"));
     }
 
-    static public void start() throws Exception {
+    synchronized static public void start() {
         try {
             stop();
 
@@ -48,33 +47,14 @@ public class SkApiClient {
 
             InputStream error = process.getErrorStream();
 
-            Thread task = new Thread(() -> {
-                try {
-                    Scanner sc = new Scanner(error);
-                    while (!Thread.currentThread().isInterrupted() && process != null && process.isAlive()) {
-                        logger.log(Level.INFO, sc.nextLine());
-                    }
-                } catch (Exception ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } finally {
-                    try {
-                        if (error != null) {
-                            error.close();
-                        }
-                    } catch (Exception exc) {
-                        logger.log(Level.SEVERE, exc.getMessage(), exc);
-                    }
-                }
-            });
-            task.setName("process-output-"+task.getId());
-            task.setDaemon(true);
-            task.start();
+            ProcessErrorReader errorReader = new ProcessErrorReader(process, error);
+            errorReader.start();
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
-    static public void stop() {
+    synchronized static public void stop() {
         try {
             if (output != null) {
                 output.close();
@@ -99,6 +79,10 @@ public class SkApiClient {
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
+    }
+
+    synchronized static public void clearCache() {
+        ImageConverter.getInstance().clearCache();
     }
 
     static private Message sendMessage(Message request) {
@@ -213,7 +197,6 @@ public class SkApiClient {
         Message response = sendMessage(new Message("findAll", buffer.array()));
 
         if (response.getData().length == 0) {
-            imageConverter.clearCache();
             return Collections.emptyIterator();
         }
 

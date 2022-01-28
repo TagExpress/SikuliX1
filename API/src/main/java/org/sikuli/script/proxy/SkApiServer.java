@@ -1,13 +1,13 @@
-package org.sikuli.script.proxyapi;
+package org.sikuli.script.proxy;
 
 import org.sikuli.script.Image;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Region;
-import org.sikuli.script.proxyapi.converters.ImageConverter;
-import org.sikuli.script.proxyapi.converters.MatchConverter;
-import org.sikuli.script.proxyapi.converters.PatternConverter;
-import org.sikuli.script.proxyapi.converters.RegionConverter;
+import org.sikuli.script.proxy.converters.ImageConverter;
+import org.sikuli.script.proxy.converters.MatchConverter;
+import org.sikuli.script.proxy.converters.PatternConverter;
+import org.sikuli.script.proxy.converters.RegionConverter;
 
 import java.io.*;
 import java.nio.ByteBuffer;
