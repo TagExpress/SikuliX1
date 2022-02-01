@@ -86,6 +86,8 @@ public class SkApiServer {
             writer.writeBytes(response.getData());
 
             output.flush();
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }

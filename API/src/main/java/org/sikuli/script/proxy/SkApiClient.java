@@ -49,6 +49,8 @@ public class SkApiClient {
 
             ProcessErrorReader errorReader = new ProcessErrorReader(process, error);
             errorReader.start();
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
@@ -76,6 +78,8 @@ public class SkApiClient {
                 }
                 process = null;
             }
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
@@ -85,43 +89,43 @@ public class SkApiClient {
         ImageConverter.getInstance().clearCache();
     }
 
-    static private Message sendMessage(Message request) {
+    synchronized static private Message sendMessage(Message request) {
         if (process == null) {
             throw new RuntimeException("server stopped!");
         }
 
-        synchronized (process) {
-            try {
-                logger.log(Level.INFO, "request message: {0}, data.length: {1}",
-                        new Object[] {request.getName(), request.getData().length});
+        try {
+            logger.log(Level.INFO, "request message: {0}, data.length: {1}",
+                    new Object[] {request.getName(), request.getData().length});
 
-                MessageWriter writer = new MessageWriter(output);
-                byte[] name = request.getName().getBytes();
+            MessageWriter writer = new MessageWriter(output);
+            byte[] name = request.getName().getBytes();
 
-                writer.writeInt(name.length);
-                writer.writeBytes(name);
+            writer.writeInt(name.length);
+            writer.writeBytes(name);
 
-                writer.writeInt(request.getData().length);
-                writer.writeBytes(request.getData());
+            writer.writeInt(request.getData().length);
+            writer.writeBytes(request.getData());
 
-                output.flush();
+            output.flush();
 
-                MessageReader reader = new MessageReader(input);
-                Message response = new Message(null, null);
-                response.setName(new String(reader.readBytes(reader.readInt())));
-                response.setData(reader.readBytes(reader.readInt()));
+            MessageReader reader = new MessageReader(input);
+            Message response = new Message(null, null);
+            response.setName(new String(reader.readBytes(reader.readInt())));
+            response.setData(reader.readBytes(reader.readInt()));
 
-                logger.log(Level.INFO, "response message: {0}, data.length: {1}",
-                        new Object[] {response.getName(), response.getData().length});
+            logger.log(Level.INFO, "response message: {0}, data.length: {1}",
+                    new Object[] {response.getName(), response.getData().length});
 
-                if ("exception".equals(response.getName())) {
-                    throw new RuntimeException(new String(response.getData()));
-                }
-
-                return response;
-            } catch (Exception ex) {
-                throw new RuntimeException(ex.getMessage(), ex);
+            if ("exception".equals(response.getName())) {
+                throw new RuntimeException(new String(response.getData()));
             }
+
+            return response;
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
