@@ -47,7 +47,7 @@ public class SkApiClient {
 
             InputStream error = process.getErrorStream();
 
-            ProcessErrorReader errorReader = new ProcessErrorReader(process, error);
+            ProcessReader errorReader = new ProcessReader(process, error);
             errorReader.start();
         } catch (RuntimeException ex) {
             throw ex;
