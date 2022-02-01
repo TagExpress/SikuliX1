@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 public class SkApiClient {
     private static final Logger logger = Logger.getLogger(SkApiClient.class.getName());
-    private static volatile Process process;
+    private static Process process;
     private static InputStream input;
     private static OutputStream output;
 
