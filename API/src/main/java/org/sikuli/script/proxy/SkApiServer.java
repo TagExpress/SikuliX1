@@ -1,6 +1,7 @@
 package org.sikuli.script.proxy;
 
 import org.sikuli.basics.Debug;
+import org.sikuli.basics.Settings;
 import org.sikuli.script.Image;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
@@ -44,13 +45,13 @@ public class SkApiServer {
             request.setName(new String(reader.readBytes(reader.readInt())));
             request.setData(reader.readBytes(reader.readInt()));
 
-            //Debug.info("request message: %s, data.length: %s",
-            //        request.getName(), request.getData().length);
+            if (Settings.ProxyLogActive)
+                Debug.info("request message: %s, data.length: %s", request.getName(), request.getData().length);
 
             Message response = processMessage(request);
 
-            //Debug.info("response message: %s, data.length: %s",
-            //        response.getName(), response.getData().length);
+            if (Settings.ProxyLogActive)
+                Debug.info("response message: %s, data.length: %s", response.getName(), response.getData().length);
 
             MessageWriter writer = new MessageWriter(output);
             byte[] name = response.getName().getBytes();

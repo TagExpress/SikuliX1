@@ -152,6 +152,7 @@ public class Settings {
   public static boolean UserLogs = true;
   public static String UserLogPrefix = "user";
   public static boolean UserLogTime = true;
+  public static boolean ProxyLogActive = false;
 
   public static String getFilePathSeperator() {
     return File.separator;

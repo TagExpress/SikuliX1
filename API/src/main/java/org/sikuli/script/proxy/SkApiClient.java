@@ -1,5 +1,7 @@
 package org.sikuli.script.proxy;
 
+import org.sikuli.basics.Debug;
+import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 import org.sikuli.script.proxy.converters.ImageConverter;
 import org.sikuli.script.proxy.converters.MatchConverter;
@@ -92,8 +94,8 @@ public class SkApiClient {
         }
 
         try {
-            //Debug.info("request message: %s, data.length: %s",
-            //        request.getName(), request.getData().length);
+            if (Settings.ProxyLogActive)
+                Debug.info("request message: %s, data.length: %s", request.getName(), request.getData().length);
 
             MessageWriter writer = new MessageWriter(output);
             byte[] name = request.getName().getBytes();
@@ -111,8 +113,8 @@ public class SkApiClient {
             response.setName(new String(reader.readBytes(reader.readInt())));
             response.setData(reader.readBytes(reader.readInt()));
 
-            //Debug.info("response message: %s, data.length: %s",
-            //        response.getName(), response.getData().length);
+            if (Settings.ProxyLogActive)
+                Debug.info("response message: %s, data.length: %s", response.getName(), response.getData().length);
 
             if ("exception".equals(response.getName())) {
                 throw new RuntimeException(new String(response.getData()));
