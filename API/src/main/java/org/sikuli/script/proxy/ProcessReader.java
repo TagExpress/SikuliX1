@@ -1,12 +1,13 @@
 package org.sikuli.script.proxy;
 
+import org.sikuli.basics.Debug;
+
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ProcessReader extends Thread {
-    private final Logger logger;
     private final Process process;
     private final InputStream input;
 
@@ -16,7 +17,6 @@ public class ProcessReader extends Thread {
         setDaemon(true);
         this.process = process;
         this.input = input;
-        this.logger = Logger.getLogger(getClass().getName());
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ProcessReader extends Thread {
             Scanner sc = new Scanner(input);
             while (!Thread.currentThread().isInterrupted() && process.isAlive()) {
                 try {
-                    logger.log(Level.INFO, sc.nextLine());
+                    Debug.info(sc.nextLine());
                 } catch (Exception ex) {
                     if (!process.isAlive())
                         break;
@@ -33,14 +33,18 @@ public class ProcessReader extends Thread {
                 }
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            StringWriter writer = new StringWriter();
+            ex.printStackTrace(new PrintWriter(writer));
+            Debug.error(writer.toString());
         } finally {
             try {
                 if (input != null) {
                     input.close();
                 }
             } catch (Exception exc) {
-                logger.log(Level.SEVERE, exc.getMessage(), exc);
+                StringWriter writer = new StringWriter();
+                exc.printStackTrace(new PrintWriter(writer));
+                Debug.error(writer.toString());
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.sikuli.script.proxy;
 
+import org.sikuli.basics.Debug;
 import org.sikuli.script.Image;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
@@ -12,12 +13,8 @@ import org.sikuli.script.proxy.converters.RegionConverter;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class SkApiServer {
-    private static Logger logger;
     private static InputStream input;
     private static OutputStream output;
 
@@ -28,37 +25,16 @@ public class SkApiServer {
         System.setOut(System.err);
 
         try {
-            initializeLogger();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-
-        try {
             while (!Thread.currentThread().isInterrupted()) {
                 receiveMessage();
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            StringWriter writer = new StringWriter();
+            ex.printStackTrace(new PrintWriter(writer));
+            Debug.error(writer.toString());
+
             System.exit(1);
         }
-    }
-
-    static private void initializeLogger() throws Exception {
-        Properties logConfigProps = new Properties();
-        logConfigProps.put("handlers","java.util.logging.ConsoleHandler");
-        logConfigProps.put("java.util.logging.ConsoleHandler.level","ALL");
-        logConfigProps.put("java.util.logging.ConsoleHandler.formatter","java.util.logging.SimpleFormatter");
-        logConfigProps.put("java.util.logging.SimpleFormatter.format","%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS [%4$.4s] %2$s: %5$s%n%6$s");
-
-        ByteArrayOutputStream logData = new ByteArrayOutputStream();
-        logConfigProps.store(logData, null);
-
-        ByteArrayInputStream logConfig = new ByteArrayInputStream(logData.toByteArray());
-        LogManager logManager = LogManager.getLogManager();
-        logManager.readConfiguration(logConfig);
-
-        logger = Logger.getLogger(SkApiServer.class.getName());
     }
 
     static private void receiveMessage() {
@@ -68,13 +44,13 @@ public class SkApiServer {
             request.setName(new String(reader.readBytes(reader.readInt())));
             request.setData(reader.readBytes(reader.readInt()));
 
-            logger.log(Level.INFO, "request message: {0}, data.length: {1}",
-                    new Object[] {request.getName(), request.getData().length});
+            //Debug.info("request message: %s, data.length: %s",
+            //        request.getName(), request.getData().length);
 
             Message response = processMessage(request);
 
-            logger.log(Level.INFO, "response message: {0}, data.length: {1}",
-                    new Object[] {response.getName(), response.getData().length});
+            //Debug.info("response message: %s, data.length: %s",
+            //        response.getName(), response.getData().length);
 
             MessageWriter writer = new MessageWriter(output);
             byte[] name = response.getName().getBytes();
@@ -105,8 +81,11 @@ public class SkApiServer {
             throw new Exception("method "+request.getName()+" not found!");
         } catch (Exception ex) {
             String msg = ex.getMessage();
+
             if (msg == null) {
                 msg = "erro ao processar:" + request.getName() + System.lineSeparator();
+            } else if (!msg.endsWith(System.lineSeparator())) {
+                msg += System.lineSeparator();
             }
 
             StringWriter stringWriter = new StringWriter();

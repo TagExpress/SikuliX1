@@ -13,11 +13,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SkApiClient {
-    private static final Logger logger = Logger.getLogger(SkApiClient.class.getName());
     private static Process process;
     private static InputStream input;
     private static OutputStream output;
@@ -95,8 +92,8 @@ public class SkApiClient {
         }
 
         try {
-            logger.log(Level.INFO, "request message: {0}, data.length: {1}",
-                    new Object[] {request.getName(), request.getData().length});
+            //Debug.info("request message: %s, data.length: %s",
+            //        request.getName(), request.getData().length);
 
             MessageWriter writer = new MessageWriter(output);
             byte[] name = request.getName().getBytes();
@@ -114,8 +111,8 @@ public class SkApiClient {
             response.setName(new String(reader.readBytes(reader.readInt())));
             response.setData(reader.readBytes(reader.readInt()));
 
-            logger.log(Level.INFO, "response message: {0}, data.length: {1}",
-                    new Object[] {response.getName(), response.getData().length});
+            //Debug.info("response message: %s, data.length: %s",
+            //        response.getName(), response.getData().length);
 
             if ("exception".equals(response.getName())) {
                 throw new RuntimeException(new String(response.getData()));

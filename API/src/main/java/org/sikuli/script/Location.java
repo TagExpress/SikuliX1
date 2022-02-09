@@ -4,6 +4,7 @@
 package org.sikuli.script;
 
 import org.sikuli.basics.Debug;
+import org.sikuli.basics.DebugAction;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.support.IRobot;
 import org.sikuli.script.support.IScreen;
@@ -537,6 +538,7 @@ public class Location implements Comparable<Location>{
    */
   public Location click() {
     Mouse.click(this, "L");
+    DebugAction.debugClick(this);
     return this;
   }
 
@@ -547,6 +549,7 @@ public class Location implements Comparable<Location>{
    */
   public Location doubleClick() {
     Mouse.click(this, "LD");
+    DebugAction.debugDoubleClick(this);
     return this;
   }
 
@@ -557,6 +560,7 @@ public class Location implements Comparable<Location>{
    */
   public Location rightClick() {
     Mouse.click(this, "R");
+    DebugAction.debugRightClick(this);
     return this;
   }
   //</editor-fold>

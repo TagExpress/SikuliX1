@@ -6,6 +6,7 @@ package org.sikuli.script;
 import org.sikuli.android.ADBDevice;
 import org.sikuli.android.ADBScreen;
 import org.sikuli.basics.Debug;
+import org.sikuli.basics.DebugAction;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.proxy.SkApiClient;
 import org.sikuli.script.support.Observer;
@@ -2243,8 +2244,11 @@ public class Region extends Element {
    * @throws FindFailed if the Find operation failed
    */
   public <PSI> Match find(PSI target) throws FindFailed {
+
+    DebugAction.debugWhere(this);
+
     if (SkApiClient.isClient())
-      return SkApiClient.find(this, target);
+      return DebugAction.debugMatch(SkApiClient.find(this, target));
 
     lastMatch = null;
     Image img = Element.getImageFromTarget(target);
@@ -2283,7 +2287,8 @@ public class Region extends Element {
     if (null == response) {
       throw new FindFailed(FindFailed.createErrorMessage(this, img));
     }
-    return lastMatch;
+
+    return DebugAction.debugMatch(lastMatch);
   }
 
   /**
@@ -2297,6 +2302,9 @@ public class Region extends Element {
    * @return the match (null if not found or image file missing)
    */
   public <PSI> Match exists(PSI target, double timeout) {
+
+    DebugAction.debugWhere(this);
+
     lastMatch = null;
     RepeatableFind rf = new RepeatableFind(target, null);
     Image img = rf._image;
@@ -2325,7 +2333,7 @@ public class Region extends Element {
         img.setLastSeen(lastMatch.getRect(), lastMatch.getScore());
       }
       log(logLevel, "exists: %s has appeared (%s)", targetStr, lastMatch);
-      return lastMatch;
+      return DebugAction.debugMatch(lastMatch);
     }
     log(logLevel, "exists: %s did not appear [%d msec]", targetStr, new Date().getTime() - lastFindTime);
     return null;
@@ -2424,8 +2432,11 @@ public class Region extends Element {
    * @throws FindFailed if the Find operation failed
    */
   public <PSI> Iterator<Match> findAll(PSI target) throws FindFailed {
+
+    DebugAction.debugWhere(this);
+
     if (SkApiClient.isClient())
-      return SkApiClient.findAll(this, target);
+      return DebugAction.debugMatches(SkApiClient.findAll(this, target));
 
     lastMatches = null;
     RepeatableFindAll rf = new RepeatableFindAll(target, null);
@@ -2458,7 +2469,8 @@ public class Region extends Element {
     if (null == response) {
       throw new FindFailed(FindFailed.createErrorMessage(this, img));
     }
-    return lastMatches;
+
+    return DebugAction.debugMatches(lastMatches);
   }
 
   public <PSI> List<Match> getAll(PSI target) {
@@ -2483,10 +2495,19 @@ public class Region extends Element {
 
   public <PSI> List<Match> findAllList(PSI target) {
     List<Match> matches = new ArrayList<>();
+
     try {
-      matches = ((Finder) findAll(target)).getList();
+      Iterator<Match> iterator = findAll(target);
+
+      if (iterator instanceof Finder) {
+        matches = ((Finder) iterator).getList();
+      } else if (iterator != null) {
+        while (iterator.hasNext())
+          matches.add(iterator.next());
+      }
     } catch (FindFailed findFailed) {
     }
+
     return matches;
   }
 
@@ -2546,15 +2567,10 @@ public class Region extends Element {
   }
 
   public Match findBest(Object... args) {
-    if (SkApiClient.isClient())
-      return SkApiClient.findBest(this, args);
-
     if (args.length == 0) {
       return null;
     }
-    List<Object> pList = new ArrayList<>();
-    pList.addAll(Arrays.asList(args));
-    return findBestList(pList);
+    return findBestList(new ArrayList<>(Arrays.asList(args)));
   }
 
   public Match findBestList(List<Object> pList) {
@@ -2562,6 +2578,12 @@ public class Region extends Element {
     if (pList == null || pList.size() == 0) {
       return null;
     }
+
+    DebugAction.debugWhere(this);
+
+    if (SkApiClient.isClient())
+      return DebugAction.debugMatch(SkApiClient.findBest(this, pList.toArray()));
+
     Match mResult = null;
     List<Match> mList = findAnyCollect(pList);
     if (mList.size() > 0) {
@@ -2579,16 +2601,15 @@ public class Region extends Element {
       });
       mResult = mList.get(0);
     }
-    return mResult;
+
+    return DebugAction.debugMatch(mResult);
   }
 
   public List<Match> findAny(Object... args) {
     if (args.length == 0) {
       return new ArrayList<Match>();
     }
-    List<Object> pList = new ArrayList<>();
-    pList.addAll(Arrays.asList(args));
-    return findAnyList(pList);
+    return findAnyList(new ArrayList<>(Arrays.asList(args)));
   }
 
   public List<Match> findAnyList(List<Object> pList) {
@@ -2596,17 +2617,17 @@ public class Region extends Element {
     if (pList == null || pList.size() == 0) {
       return new ArrayList<Match>();
     }
-    List<Match> mList = findAnyCollect(pList);
-    return mList;
+
+    DebugAction.debugWhere(this);
+
+    return DebugAction.debugMatches(findAnyCollect(pList));
   }
 
   public Region unionAny(Object... targets) {
     if (targets.length < 2) {
       return this;
     }
-    List<Object> pList = new ArrayList<>();
-    pList.addAll(Arrays.asList(targets));
-    return unionAnyList(pList);
+    return unionAnyList(new ArrayList<>(Arrays.asList(targets)));
   }
 
   public Region unionAnyList(List<Object> targets) {
@@ -2670,10 +2691,19 @@ public class Region extends Element {
 
   public List<Match> findAllText(String text) {
     List<Match> matches = new ArrayList<>();
+
     try {
-      matches = ((Finder) findAll("\t" + text + "\t")).getList();
+      Iterator<Match> iterator = findAll("\t" + text + "\t");
+
+      if (iterator instanceof Finder) {
+        matches = ((Finder) iterator).getList();
+      } else if (iterator != null) {
+        while (iterator.hasNext())
+          matches.add(iterator.next());
+      }
     } catch (FindFailed ff) {
     }
+
     return matches;
   }
 
@@ -3129,7 +3159,7 @@ public class Region extends Element {
 
   private List<Match> findAnyCollect(List<Object> pList) {
     List<Match> mList = new ArrayList<Match>();
-    if (pList == null) {
+    if (pList == null || pList.isEmpty()) {
       return mList;
     }
     Match[] mArray = new Match[pList.size()];
@@ -3801,6 +3831,8 @@ public class Region extends Element {
     Location loc = getLocationFromTarget(target);
     if (null != loc) {
       ret = Mouse.click(loc, InputEvent.BUTTON1_MASK, modifiers, false, this);
+      if (ret == 1)
+        DebugAction.debugClick(loc);
     }
     //TODO      SikuliActionManager.getInstance().clickTarget(this, target, _lastScreenImage, _lastMatch);
     return ret;
@@ -3850,6 +3882,8 @@ public class Region extends Element {
     int ret = 0;
     if (null != loc) {
       ret = Mouse.click(loc, InputEvent.BUTTON1_MASK, modifiers, true, this);
+      if (ret == 1)
+        DebugAction.debugDoubleClick(loc);
     }
     //TODO      SikuliActionManager.getInstance().doubleClickTarget(this, target, _lastScreenImage, _lastMatch);
     return ret;
@@ -3898,6 +3932,8 @@ public class Region extends Element {
     int ret = 0;
     if (null != loc) {
       ret = Mouse.click(loc, InputEvent.BUTTON3_MASK, modifiers, false, this);
+      if (ret == 1)
+        DebugAction.debugRightClick(loc);
     }
     //TODO      SikuliActionManager.getInstance().rightClickTarget(this, target, _lastScreenImage, _lastMatch);
     return ret;
