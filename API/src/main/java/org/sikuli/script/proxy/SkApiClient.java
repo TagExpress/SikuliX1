@@ -22,7 +22,7 @@ public class SkApiClient {
     private static OutputStream output;
 
     static public boolean isClient() {
-        return Boolean.parseBoolean(System.getProperty("sikulixapiclient", "false"));
+        return Boolean.getBoolean("sikulixapiclient");
     }
 
     synchronized static public void start() {
